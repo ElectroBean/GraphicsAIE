@@ -6,6 +6,11 @@ Camera::Camera()
 {
 }
 
+Camera::Camera(GLFWwindow* window)
+{
+	myWindow = window;
+}
+
 
 Camera::~Camera()
 {
@@ -29,30 +34,30 @@ void Camera::setPosition(glm::vec3 position)
 	updateProjectionViewTransform();
 }
 
-glm::mat4 Camera::getWorldTransform()
+glm::mat4 Camera::getWorldTransform() const
 {
-	return glm::mat4();
+	return worldTransform;
 }
 
-glm::mat4 Camera::getView()
+glm::mat4 Camera::getView() const
 {
 
-	return glm::mat4();
+	return viewTransform;
 }
 
-glm::mat4 Camera::getProjection()
+glm::mat4 Camera::getProjection() const
 {
 
-	return glm::mat4();
+	return projectionTransform;
 }
 
-glm::mat4 Camera::getProjectionView()
+glm::mat4 Camera::getProjectionView() const
 {
 
-	return glm::mat4();
+	return projectionViewTransform;
 }
 
 void Camera::updateProjectionViewTransform()
 {
-	projectionViewTransform = viewTransform * worldTransform;
+	projectionViewTransform = viewTransform * projectionTransform;
 }

@@ -6,14 +6,17 @@ class FlyCamera :
 	public Camera
 {
 public:
-	FlyCamera();
+	FlyCamera(GLFWwindow* window);
 	~FlyCamera();
 
 	void update(float deltaTime);
 	void setSpeed(float speed);
 
-private:
+	double mouseX;
+	double mouseY;
+protected:
 	float speed;
 	glm::vec3 up;
+
 };
 

@@ -31,15 +31,12 @@ void Application::Run(const char * title, int width, int height, bool fullscreen
 		App::time currentTime = myClock.now();
 		App::time previousTime = myClock.now();
 
-		auto difference = currentTime - previousTime;
-		float deltaTime = difference.count() * NANO_TO_SECONDS;
-
 		while (playing)
 		{
 			//delta Time calc
 			currentTime = myClock.now();
-			auto diff = currentTime - previousTime;
-			deltaTime = difference.count() * NANO_TO_SECONDS;
+			auto difference = currentTime - previousTime;
+			float deltaTime = difference.count() * NANO_TO_SECONDS;
 			
 
 			Update(deltaTime);

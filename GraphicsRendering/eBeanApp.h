@@ -6,6 +6,7 @@
 #include "glfw3.h"
 #include "Gizmos.h"
 #include "Application.h"
+#include "FlyCamera.h"
 
 class eBeanApp : public Application
 {
@@ -22,5 +23,7 @@ public:
 protected:
 	glm::mat4 view;
 	glm::mat4 projection;
+
+	FlyCamera* myCamera;
 };
 

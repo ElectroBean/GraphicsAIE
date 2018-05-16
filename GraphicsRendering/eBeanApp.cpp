@@ -28,6 +28,11 @@ bool eBeanApp::Initialize()
 	aie::Gizmos::create(10000, 10000, 10000, 10000);
 	view = glm::lookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	myCamera = new FlyCamera(window);
+	myCamera->setSpeed(10.0f);
+	myCamera->setLookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
+	myCamera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	//myCamera->setPosition(glm::vec3(0, 0, 0));
 
 	return true;
 }
@@ -40,6 +45,8 @@ void eBeanApp::Terminate()
 void eBeanApp::Update(float deltaTime)
 {
 	aie::Gizmos::addTransform(glm::mat4(1));
+
+	myCamera->update(deltaTime);
 
 	glm::vec4 white(1);
 	glm::vec4 black(0, 0, 0, 1);
@@ -65,6 +72,7 @@ void eBeanApp::Update(float deltaTime)
 void eBeanApp::Render()
 {
 	ClearScreen();
-	aie::Gizmos::draw(projection * view);
+	aie::Gizmos::draw(myCamera->getProjectionView());
+	//aie::Gizmos::draw(projection * view);
 }
 
