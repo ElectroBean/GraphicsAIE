@@ -4,11 +4,13 @@
 
 Camera::Camera()
 {
+	worldTransform = glm::mat4(1.0f);
 }
 
 Camera::Camera(GLFWwindow* window)
 {
 	myWindow = window;
+	worldTransform = glm::mat4(1.0f);
 }
 
 
@@ -59,5 +61,5 @@ glm::mat4 Camera::getProjectionView() const
 
 void Camera::updateProjectionViewTransform()
 {
-	projectionViewTransform = viewTransform * projectionTransform;
+	projectionViewTransform = projectionViewTransform * viewTransform;
 }
