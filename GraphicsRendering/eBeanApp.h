@@ -7,6 +7,8 @@
 #include "Gizmos.h"
 #include "Application.h"
 #include "FlyCamera.h"
+#include "Mesh.h"
+#include "Shader.h"
 
 class eBeanApp : public Application
 {
@@ -25,5 +27,9 @@ protected:
 	glm::mat4 projection;
 
 	FlyCamera* myCamera;
+
+	aie::ShaderProgram m_shader;
+	Mesh m_quadMesh;
+	glm::mat4 m_quadTransform;
 };
 

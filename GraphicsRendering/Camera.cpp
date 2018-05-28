@@ -20,7 +20,7 @@ Camera::~Camera()
 
 void Camera::setPerspective(float fov, float aspectRatio, float near, float far)
 {
-	projectionTransform = glm::perspective(glm::pi<float>() * fov, aspectRatio, near, far);
+	projectionTransform = glm::perspective(/*glm::pi<float>() **/ fov, aspectRatio, near, far);
 	updateProjectionViewTransform();
 }
 
@@ -61,5 +61,5 @@ glm::mat4 Camera::getProjectionView() const
 
 void Camera::updateProjectionViewTransform()
 {
-	projectionViewTransform = projectionViewTransform * viewTransform;
+	projectionViewTransform = projectionTransform * viewTransform/*viewTransform * projectionTransform*/;
 }

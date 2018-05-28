@@ -29,10 +29,27 @@ bool eBeanApp::Initialize()
 	view = glm::lookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera = new FlyCamera(window);
-	myCamera->setSpeed(10.0f);
+	myCamera->setSpeed(100.0f);
 	myCamera->setLookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	myCamera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-	myCamera->setPosition(glm::vec3(0, 0, 0));
+	myCamera->setPosition(glm::vec3(0, 10, 10));
+
+	//shader stuff
+	m_shader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_shader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+	if (m_shader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_shader.getLastError());
+		return false;
+	}
+	m_quadMesh.initialiseQuad();
+
+	m_quadTransform = {
+		10, 0, 0, 0,
+		0, 10, 0, 0,
+		0, 0, 10, 0,
+		0, 0, 0, 10,
+	};
 
 	return true;
 }
@@ -73,6 +90,15 @@ void eBeanApp::Render()
 {
 	ClearScreen();
 	aie::Gizmos::draw(myCamera->getProjectionView());
-	//aie::Gizmos::draw(projection * view);
+
+	//bind shader
+	m_shader.bind();
+
+	//bindtransform
+	auto pvm = projection * view * m_quadTransform;
+	m_shader.bindUniform("ProjectionViewModel", pvm);
+
+	//draw quad
+	m_quadMesh.draw(); 
 }
 
