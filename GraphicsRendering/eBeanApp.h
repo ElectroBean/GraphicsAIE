@@ -9,6 +9,7 @@
 #include "FlyCamera.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 
 class eBeanApp : public Application
 {
@@ -31,5 +32,10 @@ protected:
 	aie::ShaderProgram m_shader;
 	Mesh m_quadMesh;
 	glm::mat4 m_quadTransform;
+
+	Mesh m_cubeMesh;
+	glm::mat4 m_cubeTransform;
+
+	aie::Texture m_gridTexture;
 };
 

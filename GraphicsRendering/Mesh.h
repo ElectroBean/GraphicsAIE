@@ -14,7 +14,15 @@ public:
 		glm::vec2 texCoord;
 	};
 
+	void initialise(unsigned int vertexCount, const Vertex* vertices,
+		unsigned int indexCount = 0,
+		unsigned int* indeces = nullptr);
+
 	void initialiseQuad();
+	void initialiseCylinder();
+	void initialiseQuadPyramid();
+	void initialiseCube(const glm::vec3 center, glm::vec3 extents, const glm::mat4* transform = nullptr);
+
 	virtual void draw();
 
 protected:
