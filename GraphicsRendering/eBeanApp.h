@@ -10,6 +10,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "OBJMesh.h"
+#include <time.h>
 
 class eBeanApp : public Application
 {
@@ -37,5 +39,22 @@ protected:
 	glm::mat4 m_cubeTransform;
 
 	aie::Texture m_gridTexture;
+
+	struct Light {
+		glm::vec3 direction;
+		glm::vec3 diffuse;
+		glm::vec3 specular;
+	};
+
+	aie::ShaderProgram m_normalMapShader;
+	aie::OBJMesh m_spearMesh;
+	glm::mat4 m_spearTransform;
+
+	aie::OBJMesh m_dragonMesh;
+	glm::mat4 m_dragonTransform;
+
+	aie::ShaderProgram m_phongShader;
+	Light m_light;
+	glm::vec3  m_ambientLight;
 };
 

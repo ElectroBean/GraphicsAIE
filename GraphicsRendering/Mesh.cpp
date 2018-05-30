@@ -88,13 +88,23 @@ void Mesh::initialiseQuad()
 
 
 	// MORE TO GO HERE
+	vertices[0].normal = { 0, 1, 0, 0 };
+	vertices[1].normal = { 0, 1, 0, 0 };
+	vertices[2].normal = { 0, 1, 0, 0 };
+	vertices[3].normal = { 0, 1, 0, 0 };
+	vertices[4].normal = { 0, 1, 0, 0 };
+	vertices[5].normal = { 0, 1, 0, 0 };	// enable second element as normal
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,
+		sizeof(Vertex), (void*)16);
 
 	vertices[0].texCoord = { 0, 1 }; // bottom left
 	vertices[1].texCoord = { 1, 1 }; // bottom right
 	vertices[2].texCoord = { 0, 0 }; // top left
 	vertices[3].texCoord = { 0, 0 }; // top left
 	vertices[4].texCoord = { 1, 1 }; // bottom right
-	vertices[5].texCoord = { 1, 0 }; // top right
+	vertices[5].texCoord = { 1, 0 }; // top right
+
     // enable third element as texture
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,

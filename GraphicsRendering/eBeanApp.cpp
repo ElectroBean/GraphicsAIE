@@ -29,7 +29,7 @@ bool eBeanApp::Initialize()
 	view = glm::lookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera = new FlyCamera(window);
-	myCamera->setSpeed(25.0f);
+	myCamera->setSpeed(10.0f);
 	myCamera->setLookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	myCamera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera->setPosition(glm::vec3(0, 10, 10));
@@ -83,6 +83,49 @@ bool eBeanApp::Initialize()
 	}
 
 
+	if (m_spearMesh.load("../meshes/soulspear/soulspear.obj", true, true) == false)
+	{
+		printf("Soulspear mesh error!\n");
+		return false;
+	}
+
+	m_spearTransform = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/normalmap.vert");	m_normalMapShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/normalmap.frag");
+	if (m_normalMapShader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_normalMapShader.getLastError());
+		return false;
+	}
+
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/phong.vert");	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/phong.frag");
+	if (m_phongShader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+	if (m_dragonMesh.load("../meshes/stanford/dragon.obj", true, true) == false)
+	{
+		printf("dragon mesh error!\n");
+		return false;
+	}
+
+	m_dragonTransform = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
+
+	//lighting
+	m_light.diffuse = { 1, 1, 0 };
+	m_light.specular = { 1, 1, 0 }; 
+	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+
 	return true;
 }
 
@@ -96,6 +139,9 @@ void eBeanApp::Update(float deltaTime)
 	aie::Gizmos::addTransform(glm::mat4(1));
 
 	myCamera->update(deltaTime);
+
+	float time = GetCurrentTime(time);
+	m_light.direction = glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
 
 	glm::vec4 white(1);
 	glm::vec4 black(0, 0, 0, 1);
@@ -123,22 +169,31 @@ void eBeanApp::Render()
 	ClearScreen();
 
 	//bind shader
-	m_shader.bind();
+	//m_shader.bind();
+	//m_normalMapShader.bind();
+	m_phongShader.bind();
 
-	////bindtransform
-	//auto pvm = myCamera->getProjectionView() * m_quadTransform;
-	//m_shader.bindUniform("ProjectionViewModel", pvm);
-	////draw quad
-	//m_quadMesh.draw(); 
+	//bind light
+	m_phongShader.bindUniform("Ia", m_ambientLight);
+	m_phongShader.bindUniform("Id", m_light.diffuse);
+	m_phongShader.bindUniform("Is", m_light.specular);
+	m_phongShader.bindUniform("LightDirection", m_light.direction);
 
+	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
 
-	auto pvm2 = myCamera->getProjectionView();
-	m_shader.bindUniform("ProjectionViewModel", pvm2);
+	//bind tarnsform
+	auto pvm3 = myCamera->getProjectionView() * m_spearTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm3);
 
-	m_shader.bindUniform("diffuseTexture", 0);
-	m_gridTexture.bind(0);
-	m_cubeMesh.draw();
+	//auto pvm4 = myCamera->getProjectionView() * m_dragonTransform;
+	//m_phongShader.bindUniform("ProjectionViewModel", pvm4);
 
-	aie::Gizmos::draw(myCamera->getProjectionView());	aie::Gizmos::draw2D(1280, 720);
+	//bind transforms for lighting
+	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
+	//m_spearMesh.draw();
+	m_dragonMesh.draw();
+
+	aie::Gizmos::draw(myCamera->getProjectionView());
+	aie::Gizmos::draw2D(1280, 720);
 }
 
