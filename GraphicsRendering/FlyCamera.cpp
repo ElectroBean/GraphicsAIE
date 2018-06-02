@@ -41,9 +41,10 @@ void FlyCamera::update(float deltaTime)
 
 	
 
-	//word transform[3][3] = 1.0f;
-	//view transform = glm::inverse(m_worldtransform)
-	//UpdateProjectionViewTransform();
+	//worldTransform[3][3] = 1.0f;
+	//viewTransform = glm::inverse(worldTransform);
+	
+	updateProjectionViewTransform();
 }
 
 void FlyCamera::setSpeed(float speed)
