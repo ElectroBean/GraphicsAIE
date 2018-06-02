@@ -14,6 +14,9 @@ public:
 
 	double mouseX;
 	double mouseY;
+	double deltaMouseX;
+	double deltaMouseY;
+
 protected:
 	float speed;
 	glm::vec3 up;

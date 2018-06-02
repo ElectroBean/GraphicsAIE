@@ -34,6 +34,7 @@ void Application::Run(const char * title, int width, int height, bool fullscreen
 		while (playing)
 		{
 			//delta Time calc
+			previousTime = currentTime;
 			currentTime = myClock.now();
 			auto difference = currentTime - previousTime;
 			float deltaTime = difference.count() * NANO_TO_SECONDS;
@@ -60,6 +61,7 @@ void Application::Render()
 {
 
 }
+
 
 void Application::ClearScreen()
 {

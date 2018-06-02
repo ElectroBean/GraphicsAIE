@@ -4,11 +4,13 @@
 
 Camera::Camera()
 {
+	worldTransform = glm::mat4(1.0f);
 }
 
 Camera::Camera(GLFWwindow* window)
 {
 	myWindow = window;
+	worldTransform = glm::mat4(1.0f);
 }
 
 
@@ -18,7 +20,7 @@ Camera::~Camera()
 
 void Camera::setPerspective(float fov, float aspectRatio, float near, float far)
 {
-	projectionTransform = glm::perspective(glm::pi<float>() * fov, aspectRatio, near, far);
+	projectionTransform = glm::perspective(/*glm::pi<float>() **/ fov, aspectRatio, near, far);
 	updateProjectionViewTransform();
 }
 
@@ -59,5 +61,9 @@ glm::mat4 Camera::getProjectionView() const
 
 void Camera::updateProjectionViewTransform()
 {
+<<<<<<< HEAD
 	projectionViewTransform = projectionTransform * viewTransform;
+=======
+	projectionViewTransform = projectionTransform * viewTransform/*viewTransform * projectionTransform*/;
+>>>>>>> ed3b5b1a791f5398557b71dc590a29ac31fb356e
 }

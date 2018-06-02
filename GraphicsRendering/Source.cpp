@@ -33,9 +33,6 @@ int main()
 	//newApp.Initialize();
 	newApp.Run("asd", 1280, 720, false);
 
-
-
-
 	eBean::clock myClock;
 	eBean::time startTime = myClock.now();
 	eBean::time currentTime = myClock.now();
