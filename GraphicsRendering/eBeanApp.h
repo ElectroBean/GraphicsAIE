@@ -12,7 +12,8 @@
 #include "Texture.h"
 #include "OBJMesh.h"
 #include <time.h>
-
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 class eBeanApp : public Application
 {
 public:
@@ -39,6 +40,8 @@ protected:
 	glm::mat4 m_cubeTransform;
 
 	aie::Texture m_gridTexture;
+	aie::Texture m_soulspearTexture;
+	aie::Texture m_soulspearSpecularTexture;
 
 	struct Light {
 		glm::vec3 direction;
@@ -56,5 +59,9 @@ protected:
 	aie::ShaderProgram m_phongShader;
 	Light m_light;
 	glm::vec3  m_ambientLight;
+
+	glm::vec3 m_positions[2]; 
+	glm::quat m_rotations[2];
+
 };
 

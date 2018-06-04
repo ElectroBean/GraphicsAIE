@@ -2,6 +2,7 @@
 #version 410
 in vec4 vPosition;
 in vec3 vNormal;
+in vec2 vTexCoord;
 
 uniform vec3 Ia; // ambient light colour
 uniform vec3 Id; // diffuse light colour
@@ -15,28 +16,33 @@ uniform vec3 Ks; // specular material colour
 uniform float specularPower; // material specular power
 
 uniform vec3 cameraPosition;
-uniform sampler2D sampler;
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
 
 void main() {
-// ensure normal and light direction are normalised
-vec3 N = normalize(vNormal);
-vec3 L = normalize(LightDirection);
-// calculate lambert term (negate light direction)
-float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
-// output lambert as grayscale
-//FragColour = vec4( lambertTerm, lambertTerm, lambertTerm, 1 );
 
-// calculate view vector and reflection vector
-vec3 V = normalize(cameraPosition - vPosition.xyz);
-vec3 R = reflect( L, N );
-// calculate specular term
-float specularTerm = pow( max( 0, dot( R, V ) ), specularPower );
 
-// calculate each colour prop.
-vec3 ambient = Ia * Ka;
-vec3 diffuse = Id * Kd * lambertTerm;
-vec3 specular = Is * Ks * specularTerm;
+	// ensure normal and light direction are normalised
+	vec3 N = normalize(vNormal);
+	vec3 L = normalize(LightDirection);
+	// calculate lambert term (negate light direction)
+	float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
+	// output lambert as grayscale
+	//FragColour = vec4( lambertTerm, lambertTerm, lambertTerm, 1 );
+	vec3 texDiffuse = texture(diffuseTexture, vTexCoord).rbg;
+	vec3 texSpecular = texture(specularTexture, vTexCoord).rbg;
 
-// output final colour
-FragColour = vec4( ambient + diffuse + specular, 1 );
+	// calculate view vector and reflection vector
+	vec3 V = normalize(cameraPosition - vPosition.xyz);
+	vec3 R = reflect( L, N );
+	// calculate specular term
+	float specularTerm = pow( max( 0, dot( R, V ) ), specularPower );
+
+	// calculate each colour prop.
+	vec3 ambient = Ia * Ka;
+	vec3 diffuse = Id * Kd * texDiffuse * lambertTerm;
+	vec3 specular = Is * Ks * texSpecular * specularTerm;
+
+	// output final colour
+	FragColour = vec4( ambient + diffuse + specular, 1 );
 }

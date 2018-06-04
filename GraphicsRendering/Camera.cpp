@@ -61,9 +61,5 @@ glm::mat4 Camera::getProjectionView() const
 
 void Camera::updateProjectionViewTransform()
 {
-<<<<<<< HEAD
 	projectionViewTransform = projectionTransform * viewTransform;
-=======
-	projectionViewTransform = projectionTransform * viewTransform/*viewTransform * projectionTransform*/;
->>>>>>> ed3b5b1a791f5398557b71dc590a29ac31fb356e
 }
