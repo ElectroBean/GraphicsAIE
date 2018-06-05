@@ -14,6 +14,8 @@
 #include <time.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "RenderTarget.h"
+
 class eBeanApp : public Application
 {
 public:
@@ -31,10 +33,6 @@ protected:
 	glm::mat4 projection;
 
 	FlyCamera* myCamera;
-
-	aie::ShaderProgram m_shader;
-	Mesh m_quadMesh;
-	glm::mat4 m_quadTransform;
 
 	Mesh m_cubeMesh;
 	glm::mat4 m_cubeTransform;
@@ -62,6 +60,12 @@ protected:
 
 	glm::vec3 m_positions[2]; 
 	glm::quat m_rotations[2];
+
+	aie::ShaderProgram m_texturedShader;
+	aie::OBJMesh m_lucyMesh;
+	glm::mat4 m_lucyTransform;
+
+	aie::RenderTarget m_renderTarget;
 
 };
 

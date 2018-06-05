@@ -2,6 +2,8 @@
 #version 410
 in vec4 vPosition;
 in vec3 vNormal;
+in vec3 vTangent;
+in vec3 vBiTangent;
 in vec2 vTexCoord;
 
 uniform vec3 Ia; // ambient light colour
@@ -18,19 +20,27 @@ uniform float specularPower; // material specular power
 uniform vec3 cameraPosition;
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
 
 void main() {
 
 
 	// ensure normal and light direction are normalised
 	vec3 N = normalize(vNormal);
+	vec3 T = normalize(vTangent);
+	vec3 B = normalize(vBiTangent);
 	vec3 L = normalize(LightDirection);
+	mat3 TBN = mat3(T,B,N);
+	
 	// calculate lambert term (negate light direction)
 	float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
 	// output lambert as grayscale
 	//FragColour = vec4( lambertTerm, lambertTerm, lambertTerm, 1 );
-	vec3 texDiffuse = texture(diffuseTexture, vTexCoord).rbg;
-	vec3 texSpecular = texture(specularTexture, vTexCoord).rbg;
+	vec3 texDiffuse = texture(diffuseTexture, vTexCoord).rgb;
+	vec3 texSpecular = texture(specularTexture, vTexCoord).rgb;
+	vec3 texNormal = texture( normalTexture, vTexCoord ).rgb;
+	
+	N = TBN * (texNormal * 2 - 1);
 
 	// calculate view vector and reflection vector
 	vec3 V = normalize(cameraPosition - vPosition.xyz);

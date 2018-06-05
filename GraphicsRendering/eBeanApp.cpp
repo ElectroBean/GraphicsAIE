@@ -14,7 +14,7 @@ bool eBeanApp::Initialize()
 	view = glm::lookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera = new FlyCamera(window);
-	myCamera->setSpeed(75.0f);
+	myCamera->setSpeed(15.f);
 	myCamera->setLookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	myCamera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera->setPosition(glm::vec3(0, 10, 10));
@@ -31,7 +31,7 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	if (m_spearMesh.load("../meshes/soulspear/soulspear.obj", true, true) == false)
+	if (m_spearMesh.load("../meshes/soulspear/Lucy.obj", true, true) == false)
 	{
 		printf("Soulspear mesh error!\n");
 		return false;
@@ -59,9 +59,36 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
+	m_texturedShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/textured.vert");
+	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/textured.frag");
+	if (m_texturedShader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_texturedShader.getLastError());
+		return false;
+	}
+
+	if (m_lucyMesh.load("../meshes/stanford/Lucy.obj", true, true) == false)
+	{
+		printf("lucy mesh error!\n");
+		return false;
+	}
+
+	m_lucyTransform = {
+	1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1
+	};
+
+	if (m_renderTarget.initialise(1, 1280,
+		720) == false) {
+		printf("Render Target Error!\n");
+		return false;
+	}
+
 	//lighting
 	m_light.diffuse = { 1, 1, 0 };
-	m_light.specular = { 1, 1, 0 }; 
+	m_light.specular = { 1, 1, 0 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	m_positions[0] = glm::vec3(10, 5, 10);
@@ -111,7 +138,7 @@ void eBeanApp::Update(float deltaTime)
 	// draw a transform and box
 	aie::Gizmos::addTransform(m);
 	aie::Gizmos::addAABBFilled(p, glm::vec3(.5f), glm::vec4(1, 0, 0, 1), &m);
-	
+
 	int state = glfwGetKey(window, GLFW_KEY_ESCAPE);
 	if (state != 0)
 	{
@@ -130,24 +157,25 @@ void eBeanApp::Render()
 	m_phongShader.bindUniform("Id", m_light.diffuse);
 	m_phongShader.bindUniform("Is", m_light.specular);
 	m_phongShader.bindUniform("LightDirection", m_light.direction);
-
 	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
 
 	//bind tarnsform
-	auto pvm3 = myCamera->getProjectionView() * m_spearTransform;
-	m_phongShader.bindUniform("ProjectionViewModel", pvm3);
-
-	//auto pvm4 = myCamera->getProjectionView() * m_dragonTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm4);
+	auto pvm = myCamera->getProjectionView() * m_spearTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
 
 	//bind transforms for lighting
-	m_soulspearTexture.bind(0);
+	m_soulspearTexture.bind(1);
 	m_phongShader.bindUniform("diffuseTexture", 0);
 	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
 
-
 	m_spearMesh.draw();
-	//m_dragonMesh.draw();
+
+	m_texturedShader.bind();
+	pvm = myCamera->getProjectionView * m_lucyMesh;
+	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	m_texturedShader.bindUniform("diffuseTexture", 0);
+
+	m_lucyMesh.draw();
 
 	aie::Gizmos::draw(myCamera->getProjectionView());
 	aie::Gizmos::draw2D(1280, 720);
