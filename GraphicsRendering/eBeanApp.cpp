@@ -31,7 +31,7 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	if (m_spearMesh.load("../meshes/soulspear/Lucy.obj", true, true) == false)
+	if (m_spearMesh.load("../meshes/soulspear/soulspear.obj", true, true) == false)
 	{
 		printf("Soulspear mesh error!\n");
 		return false;
@@ -67,11 +67,12 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	if (m_lucyMesh.load("../meshes/stanford/Lucy.obj", true, true) == false)
-	{
-		printf("lucy mesh error!\n");
-		return false;
-	}
+	//if (m_lucyMesh.load("../meshes/stanford/Lucy.obj", true, true) == false)
+	//{
+	//	printf("lucy mesh error!\n");
+	//	return false;
+	//}
+	m_lucyMesh.initialiseQuad();
 
 	m_lucyTransform = {
 	1,0,0,0,
@@ -148,35 +149,40 @@ void eBeanApp::Update(float deltaTime)
 
 void eBeanApp::Render()
 {
+	m_renderTarget.bind();
 	ClearScreen();
-
+	
 	m_phongShader.bind();
-
+	
 	//bind light
 	m_phongShader.bindUniform("Ia", m_ambientLight);
 	m_phongShader.bindUniform("Id", m_light.diffuse);
 	m_phongShader.bindUniform("Is", m_light.specular);
 	m_phongShader.bindUniform("LightDirection", m_light.direction);
 	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
-
+	
 	//bind tarnsform
 	auto pvm = myCamera->getProjectionView() * m_spearTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
-
+	
 	//bind transforms for lighting
 	m_soulspearTexture.bind(1);
 	m_phongShader.bindUniform("diffuseTexture", 0);
 	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
-
-	m_spearMesh.draw();
-
+	
+	//m_spearMesh.draw();
+	
+	m_renderTarget.unbind();
+	ClearScreen();
+	
 	m_texturedShader.bind();
-	pvm = myCamera->getProjectionView * m_lucyMesh;
+	pvm = myCamera->getProjectionView() * m_lucyTransform;
 	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
 	m_texturedShader.bindUniform("diffuseTexture", 0);
-
+	m_renderTarget.getTarget(0).bind(0);
+	
 	m_lucyMesh.draw();
-
+	
 	aie::Gizmos::draw(myCamera->getProjectionView());
 	aie::Gizmos::draw2D(1280, 720);
 }

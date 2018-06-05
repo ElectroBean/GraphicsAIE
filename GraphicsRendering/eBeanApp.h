@@ -62,7 +62,7 @@ protected:
 	glm::quat m_rotations[2];
 
 	aie::ShaderProgram m_texturedShader;
-	aie::OBJMesh m_lucyMesh;
+	Mesh m_lucyMesh;
 	glm::mat4 m_lucyTransform;
 
 	aie::RenderTarget m_renderTarget;
