@@ -59,6 +59,12 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
+	if (m_bunnyMesh.load("../meshes/stanford/bunny.obj", true, true) == false)
+	{
+		printf("bunny mesh error!\n");
+		return false;
+	}
+
 	m_texturedShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/textured.vert");
 	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/textured.frag");
 	if (m_texturedShader.link() == false)
@@ -67,18 +73,20 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	//if (m_lucyMesh.load("../meshes/stanford/Lucy.obj", true, true) == false)
-	//{
-	//	printf("lucy mesh error!\n");
-	//	return false;
-	//}
 	m_lucyMesh.initialiseQuad();
 
 	m_lucyTransform = {
-	1,0,0,0,
-	0,1,0,0,
-	0,0,1,0,
+	10,0,0,0,
+	0,10,0,0,
+	0,0,10,0,
 	0,0,0,1
+	};
+
+	m_bunnyTransform = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
 	};
 
 	if (m_renderTarget.initialise(1, 1280,
@@ -107,7 +115,6 @@ void eBeanApp::Terminate()
 
 void eBeanApp::Update(float deltaTime)
 {
-	std::cout << deltaTime << std::endl;
 	aie::Gizmos::clear();
 	myCamera->update(deltaTime);
 
@@ -150,6 +157,7 @@ void eBeanApp::Update(float deltaTime)
 void eBeanApp::Render()
 {
 	m_renderTarget.bind();
+	//wipe the screen to the background colour
 	ClearScreen();
 	
 	m_phongShader.bind();
@@ -162,17 +170,20 @@ void eBeanApp::Render()
 	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
 	
 	//bind tarnsform
-	auto pvm = myCamera->getProjectionView() * m_spearTransform;
+	auto pvm = myCamera->getProjectionView() * m_bunnyTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
 	
 	//bind transforms for lighting
-	m_soulspearTexture.bind(1);
-	m_phongShader.bindUniform("diffuseTexture", 0);
-	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
+	//m_soulspearTexture.bind(1);
+	m_phongShader.bindUniform("diffuseTexture", m_bunnyTransform);
+	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_bunnyTransform)));
 	
 	//m_spearMesh.draw();
-	
+	//unbind target to retun to backbuffer
 	m_renderTarget.unbind();
+	m_bunnyMesh.draw();
+
+	//clear back buffer
 	ClearScreen();
 	
 	m_texturedShader.bind();
@@ -181,6 +192,7 @@ void eBeanApp::Render()
 	m_texturedShader.bindUniform("diffuseTexture", 0);
 	m_renderTarget.getTarget(0).bind(0);
 	
+	//draw quadmesh
 	m_lucyMesh.draw();
 	
 	aie::Gizmos::draw(myCamera->getProjectionView());

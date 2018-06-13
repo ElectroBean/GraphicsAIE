@@ -67,5 +67,7 @@ protected:
 
 	aie::RenderTarget m_renderTarget;
 
+	aie::OBJMesh m_bunnyMesh;
+	glm::mat4 m_bunnyTransform;
 };
 
