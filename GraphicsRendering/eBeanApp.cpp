@@ -19,17 +19,6 @@ bool eBeanApp::Initialize()
 	myCamera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	myCamera->setPosition(glm::vec3(0, 10, 10));
 
-	if (m_soulspearTexture.load("../meshes/soulspear/soulspear_diffuse.tga") == false)
-	{
-		printf("failed to load soulspear texture");
-		return false;
-	}
-
-	if (m_soulspearSpecularTexture.load("../meshes/soulspear/soulspear_specular.tga") == false)
-	{
-		printf("failed to load soulspear specular");
-		return false;
-	}
 
 	if (m_spearMesh.load("../meshes/soulspear/soulspear.obj", true, true) == false)
 	{
@@ -53,18 +42,6 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	if (m_dragonMesh.load("../meshes/stanford/dragon.obj", true, true) == false)
-	{
-		printf("dragon mesh error!\n");
-		return false;
-	}
-
-	if (m_bunnyMesh.load("../meshes/stanford/bunny.obj", true, true) == false)
-	{
-		printf("bunny mesh error!\n");
-		return false;
-	}
-
 	m_texturedShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/textured.vert");
 	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/textured.frag");
 	if (m_texturedShader.link() == false)
@@ -73,20 +50,11 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	m_lucyMesh.initialiseQuad();
-
-	m_lucyTransform = {
-	10,0,0,0,
-	0,10,0,0,
-	0,0,10,0,
-	0,0,0,1
-	};
-
 	m_bunnyTransform = {
 		1,0,0,0,
 		0,1,0,0,
 		0,0,1,0,
-		0,0,0,1
+		5,0,0,1
 	};
 
 	if (m_renderTarget.initialise(1, 1280,
@@ -96,8 +64,19 @@ bool eBeanApp::Initialize()
 	}
 
 	//lighting
-	m_light.diffuse = { 1, 1, 0 };
-	m_light.specular = { 1, 1, 0 };
+	//m_light.diffuse = { 1, 1, 0 };
+	//m_light.specular = { 1, 1, 0 };
+	//
+	//m_secondLight.direction = { 0, 0, 1 };
+	//m_secondLight.diffuse = { 1, 1, 0 };
+	for (int i = 0; i < 2; i++)
+	{
+		directionalLights[i].diffuse = { 1, 1, 0 };
+		directionalLights[i].specular = { 1, 1, 0 };
+		directionalLights[i].direction = { 0, 0, 1 };
+	}
+	//m_secondLight.specular = { 1, 1, 0 };
+
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	m_positions[0] = glm::vec3(10, 5, 10);
@@ -119,7 +98,7 @@ void eBeanApp::Update(float deltaTime)
 	myCamera->update(deltaTime);
 
 	float time = glfwGetTime();
-	m_light.direction = glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
+	directionalLights[0].direction = glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
 
 	glm::vec4 white(1);
 	glm::vec4 black(0, 0, 0, 1);
@@ -156,7 +135,7 @@ void eBeanApp::Update(float deltaTime)
 
 void eBeanApp::Render()
 {
-	m_renderTarget.bind();
+	//m_renderTarget.bind();
 	//wipe the screen to the background colour
 	ClearScreen();
 	
@@ -164,9 +143,28 @@ void eBeanApp::Render()
 	
 	//bind light
 	m_phongShader.bindUniform("Ia", m_ambientLight);
-	m_phongShader.bindUniform("Id", m_light.diffuse);
-	m_phongShader.bindUniform("Is", m_light.specular);
-	m_phongShader.bindUniform("LightDirection", m_light.direction);
+
+	//replacing with multiple
+	//m_phongShader.bindUniform("Id", m_light.diffuse);
+	//m_phongShader.bindUniform("Is", m_light.specular);
+	//m_phongShader.bindUniform("directionalLights", directionalLights);
+	//m_phongShader.bindUniform("LightDirection", m_light.direction);
+
+	//binding lighting
+	for (int i = 0; i < 2; i++)
+	{
+		std::string directionStr = "directionalLights[" + std::to_string(i) + "].direction";
+		std::string diffuseStr = "directionalLights[" + std::to_string(i) + "].diffuse";
+		std::string specularStr = "directionalLights[" + std::to_string(i) + "].specular";
+
+		const char* dir = directionStr.c_str();
+		const char* diff = diffuseStr.c_str();
+		const char* spec = specularStr.c_str();
+
+		m_phongShader.bindUniform(dir, directionalLights[i].direction);
+		m_phongShader.bindUniform(diff, directionalLights[i].diffuse);
+		m_phongShader.bindUniform(spec, directionalLights[i].specular);
+	}
 	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
 	
 	//bind tarnsform
@@ -178,22 +176,22 @@ void eBeanApp::Render()
 	m_phongShader.bindUniform("diffuseTexture", m_bunnyTransform);
 	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_bunnyTransform)));
 	
-	//m_spearMesh.draw();
+	m_spearMesh.draw();
 	//unbind target to retun to backbuffer
-	m_renderTarget.unbind();
-	m_bunnyMesh.draw();
+	//m_renderTarget.unbind();
 
 	//clear back buffer
-	ClearScreen();
+	//ClearScreen();
 	
-	m_texturedShader.bind();
-	pvm = myCamera->getProjectionView() * m_lucyTransform;
-	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
-	m_texturedShader.bindUniform("diffuseTexture", 0);
-	m_renderTarget.getTarget(0).bind(0);
+	//m_texturedShader.bind();
+	//pvm = myCamera->getProjectionView() * m_lucyTransform;
+	//m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	//m_texturedShader.bindUniform("diffuseTexture", 0);
+	//m_renderTarget.getTarget(0).bind(0);
 	
 	//draw quadmesh
-	m_lucyMesh.draw();
+	//m_bunnyMesh.draw();
+	//m_lucyMesh.draw();
 	
 	aie::Gizmos::draw(myCamera->getProjectionView());
 	aie::Gizmos::draw2D(1280, 720);

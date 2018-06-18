@@ -55,7 +55,9 @@ protected:
 	glm::mat4 m_dragonTransform;
 
 	aie::ShaderProgram m_phongShader;
-	Light m_light;
+	//Light m_light;
+	//Light m_secondLight;
+	Light directionalLights[2];
 	glm::vec3  m_ambientLight;
 
 	glm::vec3 m_positions[2]; 
@@ -69,5 +71,7 @@ protected:
 
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
+
+	
 };
 
