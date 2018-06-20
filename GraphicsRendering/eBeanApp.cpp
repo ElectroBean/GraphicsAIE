@@ -20,13 +20,26 @@ bool eBeanApp::Initialize()
 	myCamera->setPosition(glm::vec3(0, 10, 10));
 
 
+	if (m_treeDude.load("../meshes/treedude/forest-monster.obj", true, true) == false)
+	{
+		printf("tree dude mesh error!\n");
+		return false;
+	}
+
+	m_spearTransform = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
+
 	if (m_spearMesh.load("../meshes/soulspear/soulspear.obj", true, true) == false)
 	{
 		printf("Soulspear mesh error!\n");
 		return false;
 	}
 
-	m_spearTransform = {
+	m_treeDudeTransform = {
 		1,0,0,0,
 		0,1,0,0,
 		0,0,1,0,
@@ -50,13 +63,6 @@ bool eBeanApp::Initialize()
 		return false;
 	}
 
-	m_bunnyTransform = {
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		5,0,0,1
-	};
-
 	if (m_renderTarget.initialise(1, 1280,
 		720) == false) {
 		printf("Render Target Error!\n");
@@ -71,13 +77,13 @@ bool eBeanApp::Initialize()
 	//m_secondLight.diffuse = { 1, 1, 0 };
 	for (int i = 0; i < 2; i++)
 	{
-		directionalLights[i].diffuse = { 1, 1, 0 };
-		directionalLights[i].specular = { 1, 1, 0 };
+		directionalLights[i].diffuse = { 1, 1, 1 };
+		directionalLights[i].specular = { 1, 1, 1 };
 		directionalLights[i].direction = { 0, 0, 1 };
 	}
 	//m_secondLight.specular = { 1, 1, 0 };
 
-	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+	m_ambientLight = { 0, 0, 0};
 
 	m_positions[0] = glm::vec3(10, 5, 10);
 	m_positions[1] = glm::vec3(-10, 0, -10);
@@ -167,16 +173,17 @@ void eBeanApp::Render()
 	}
 	m_phongShader.bindUniform("cameraPosition", myCamera->getWorldTransform()[3]);
 	
+	
 	//bind tarnsform
-	auto pvm = myCamera->getProjectionView() * m_bunnyTransform;
+	auto pvm = myCamera->getProjectionView() * m_spearTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
-	
+
 	//bind transforms for lighting
-	//m_soulspearTexture.bind(1);
-	m_phongShader.bindUniform("diffuseTexture", m_bunnyTransform);
-	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_bunnyTransform)));
-	
+	m_phongShader.bindUniform("diffuseTexture", m_spearTransform);
+	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
+
 	m_spearMesh.draw();
+
 	//unbind target to retun to backbuffer
 	//m_renderTarget.unbind();
 
@@ -189,10 +196,35 @@ void eBeanApp::Render()
 	//m_texturedShader.bindUniform("diffuseTexture", 0);
 	//m_renderTarget.getTarget(0).bind(0);
 	
+
+
 	//draw quadmesh
 	//m_bunnyMesh.draw();
 	//m_lucyMesh.draw();
 	
 	aie::Gizmos::draw(myCamera->getProjectionView());
 	aie::Gizmos::draw2D(1280, 720);
+
+	//glDepthMask(GL_FALSE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	//glEnable(GL_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//bind tarnsform
+	pvm = myCamera->getProjectionView() * m_treeDudeTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	//bind transforms for lighting
+	m_phongShader.bindUniform("diffuseTexture", m_treeDudeTransform);
+	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_treeDudeTransform)));
+
+	m_treeDude.draw();
+	
+	glEnable(GL_CULL_FACE);
+	//glDisable(GL_BLEND);
+	glDisable(GL_ALPHA);
+	//glDepthMask(GL_TRUE);
+
+
 }

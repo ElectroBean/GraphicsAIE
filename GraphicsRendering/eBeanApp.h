@@ -51,12 +51,10 @@ protected:
 	aie::OBJMesh m_spearMesh;
 	glm::mat4 m_spearTransform;
 
-	aie::OBJMesh m_dragonMesh;
-	glm::mat4 m_dragonTransform;
+	aie::OBJMesh m_treeDude;
+	glm::mat4 m_treeDudeTransform;
 
 	aie::ShaderProgram m_phongShader;
-	//Light m_light;
-	//Light m_secondLight;
 	Light directionalLights[2];
 	glm::vec3  m_ambientLight;
 
@@ -64,14 +62,8 @@ protected:
 	glm::quat m_rotations[2];
 
 	aie::ShaderProgram m_texturedShader;
-	Mesh m_lucyMesh;
-	glm::mat4 m_lucyTransform;
 
 	aie::RenderTarget m_renderTarget;
 
-	aie::OBJMesh m_bunnyMesh;
-	glm::mat4 m_bunnyTransform;
-
-	
 };
 

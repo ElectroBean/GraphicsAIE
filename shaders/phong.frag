@@ -32,6 +32,7 @@ uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 
+
 vec3 CalcDirectionLight(DirectionalLight light, vec3 normal, vec3 viewDir){
 	vec3 lightDir = normalize(-light.direction); 
 	//diffuse shading
@@ -63,7 +64,9 @@ void main() {
 	float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
 	// output lambert as grayscale
 	//FragColour = vec4( lambertTerm, lambertTerm, lambertTerm, 1 );
-	vec3 texDiffuse = texture(diffuseTexture, vTexCoord).rgb;
+	vec4 texDiffuse = texture(diffuseTexture, vTexCoord);
+	if (texDiffuse.a < 0.5f)
+		discard;
 	vec3 texSpecular = texture(specularTexture, vTexCoord).rgb;
 	vec3 texNormal = texture( normalTexture, vTexCoord ).rgb;
 	
@@ -87,5 +90,5 @@ void main() {
 		result += CalcDirectionLight(directionalLights[i], N, V);
 
 	// output final colour
-	FragColour = vec4( result, 1 );
+	FragColour = vec4( result, texDiffuse.a );
 }

@@ -1,0 +1,38 @@
+# Blender MTL File: 'forest-monster-final.blend'
+# Material Count: 3
+
+newmtl Monster
+Ns 86.274510
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd forest-monster-skin.tga
+map_Bump forest-monster-norm.tga
+map_Ks forest-monster-spec.tga
+
+newmtl None
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl Tree
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd tree.tga
+map_Bump tree-norm.tga
+map_Ks tree-spec.tga
+map_Ns tree-spec.tga
+map_d tree.tga

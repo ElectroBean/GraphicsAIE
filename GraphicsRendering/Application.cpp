@@ -95,7 +95,7 @@ bool Application::CreateNewWindow(int width, int height, const char * screenName
 	printf("GL: %i.%i\n", major, minor);
 
 	//set clear colour
-	glClearColor(0.25f, 0.25f, 0.25f, 1);
+	glClearColor(0, 0, 0, 1);
 
 	//enable depth buffer
 	glEnable(GL_DEPTH_TEST);
